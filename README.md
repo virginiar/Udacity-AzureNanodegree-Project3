@@ -63,9 +63,36 @@ Complete a month cost analysis of each Azure resource to give an estimate total 
 
 | Azure Resource | Service Tier | Monthly Cost |
 | ------------ | ------------ | ------------ |
-| *Azure Postgres Database* |     |              |
-| *Azure Service Bus*   |         |              |
-| ...                   |         |              |
+| *Azure Postgres Database* | Basic 1vcore 5Gb    |  $25.32 |
+| *Azure Service Bus*   | Basic        |    $0.05 per million operations          |
+| *Azure Function App*  | Consumption        |         $0.00     |
+| *Azure Storage Account*  | Standard        | $0.10 + 0.14 per 10,000 operations     |
+| *Azure App Service*  | Free F1        |           $0.00 |
 
 ## Architecture Explanation
 This is a placeholder section where you can provide an explanation and reasoning for your architecture selection for both the Azure Web App and Azure Function.
+
+### Azure Web App
+
+- This is an educational project so it is a lightweight application whithout high performance compute needs and it is below the hardware limitations of the Azure App Service.
+
+- The web application is written in Python which is one of the supported languages of Azure App Service.
+
+- The project can be deployed in the free tier, which reduces costs. But if the traffic increases, it is possible to scale up horizontally and vertically.
+
+## Azure Function
+
+- The Consumption plan for Azure Function App is good for an educational project like
+this due to that the first 400,000 GB/s of execution and 1,000,000 executions are free.
+
+- The same is valid for the Azure Service Bus that has a litle cost per million of
+operations.
+
+- The creation of the Azure Function and Service Bus allows to a better user experience without timeouts when the number of attendees grown.
+
+### Azure Postgres Database
+
+- This is the most expensive resource of the deployment.
+
+- For the initial configuration, a single server with 1 vcore and 5 GB can acomplish the
+requirements. 

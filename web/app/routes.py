@@ -82,8 +82,8 @@ def notification():
             db.session.commit() """
             
             # TODO Call servicebus queue_client to enqueue notification ID
-            msg = Message(str(notification.id))
-            sentResult = queue_client.send(msg)
+            msg = Message(notification.id)
+            queue_client.send(msg)
             
             #################################################
             ## END of TODO

@@ -4,7 +4,7 @@ import psycopg2
 import os
 from datetime import datetime
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content
+from sendgrid.helpers.mail import Mail
 
 def main(msg: func.ServiceBusMessage):
 
@@ -24,13 +24,17 @@ def main(msg: func.ServiceBusMessage):
         user=POSTGRES_USER,
         password=POSTGRES_PW,
         host=POSTGRES_URL)
+    
+    curs = conn.cursor()
     logging.info("Connected to database")
 
     try:
-        curs = conn.cursor()
-
+        
         # TODO: Get notification message and subject from database using the notification_id
-        notification = curs.execute("SELECT message, subject FROM notification WHERE id = {};".format(notification_id))
+        curs.execute("SELECT message, subject FROM notification WHERE id = {};".format(notification_id))
+        notification = curs.fetchone()
+        message = notification[0]
+        subject = notification[1]
         logging.info("Get notification")
 
         # TODO: Get attendees email and name
@@ -40,14 +44,14 @@ def main(msg: func.ServiceBusMessage):
 
         # TODO: Loop through each attendee and send an email with a personalized subject
         for attendee in attendees:
-            subject = 'Notification for {} {}'.format(attendee[0], attendee[1])
-            message = Mail(
+            personalized = '{} for {} {}'.format(subject, attendee[0], attendee[1])
+            mail = Mail(
                 from_email=ADMIN_EMAIL_ADDRESS,
                 to_emails=attendee[2],
-                subject=subject,
-                plain_text_content=notification)
+                subject=personalized,
+                plain_text_content=message)
             sg = SendGridAPIClient(api_key=SENDGRID_API_KEY)
-            response = sg.send(message)
+            response = sg.send(mail)
             logging.info('Sending mail: {}'.format(subject))
         
         # TODO: Update the notification table by setting the completed date and updating the status with the total number of attendees notified
